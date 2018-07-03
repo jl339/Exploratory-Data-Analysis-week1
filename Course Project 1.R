@@ -1,25 +1,17 @@
-fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
-if(!file.exists("data")){
-dir.create("data")
-}
-download.file(fileUrl, destfile="./data/survey.csv")
-#survey <- read.table("./data/survey.csv", sep=",", header=TRUE)
-#head(which(survey$ACR==3 & survey$AGS==6),3)
 
-dt <- data.table(read.csv("./data/survey.csv"))
-varNames <- names(dt)
-varNamesSplit <- strsplit(varNames, "wgtp")
-varNamesSplit[[123]]
+data <- read.table("./data.txt", header=TRUE, sep=";", na.strings = "?", colClasses = c('character','character','numeric','numeric','numeric','numeric','numeric','numeric','numeric'))
+ dim(data) 
+print((2075259 *9*8)/2^20)
+
+subset <- data$Date == "1/2/2007" | data$Date == "2/2/2007"
+newData <- data[subset, ]
+
+newData$Date <- as.Date(newData$Date, "%d/%m/%Y")
+dateTime <- paste(newData$Date, newData$Time)
+dateTime <- setNames(dateTime, "DateTime")
+
+newData <- newData[ ,!(names(newData) %in% c("Date","Time"))]
+newData <- cbind(dateTime, newData)
+newData$dateTime <- as.POSIXct(dateTime)
 
 
-
-url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv"
-f <- file.path(getwd(), "GDP.csv")
-download.file(url, f)
-dtGDP <- data.table(read.csv(f, skip = 4, nrows = 215, stringsAsFactors = FALSE))
-dtGDP <- dtGDP[X != ""]
-dtGDP <- dtGDP[, list(X, X.1, X.3, X.4)]
-setnames(dtGDP, c("X", "X.1", "X.3", "X.4"), c("CountryCode", "rankingGDP", 
-    "Long.Name", "gdp"))
-gdp <- as.numeric(gsub(",", "", dtGDP$gdp))
-mean(gdp, na.rm = TRUE)
