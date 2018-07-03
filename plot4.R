@@ -1,3 +1,4 @@
+source("Course Project1.R")
 png(filename = "plot4.png", 
     width = 480, height = 480,
     units = "px", bg = "transparent")
